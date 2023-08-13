@@ -1,0 +1,40 @@
+        html {
+            scroll-behavior: smooth;
+        }
+
+        #loading-bar {
+  
+  background-color: rgba(78,114,255,255);
+  height: 5px;
+  width: 0;
+  position: fixed;
+  z-index: 666000666;
+  -webkit-transition:width 500ms ease-out, height 500ms ease-out;
+  -moz-transition:width 500ms ease-out, height 500ms ease-out;
+  -o-transition:width 500ms ease-out, height 500ms ease-out;
+  transition:width 500ms ease-out, height 500ms ease-out;
+
+}
+
+#loading-bar.no-transition { 
+  -webkit-transition:none;
+  -moz-transition:none;
+  -o-transition:none;
+  transition:none;
+}
+
+#loading-bar.top, #loading-bar.bottom, #loading-bar.left { left: 0;}
+#loading-bar.top, #loading-bar.left, #loading-bar.right { top: 0;}
+#loading-bar.left, #loading-bar.right { width: 5px; height: 0; }
+#loading-bar.bottom { bottom: 0; }
+#loading-bar.right { right:0; }
+
+.loadingOverlay {
+    width: 100%;
+    height: 100%;
+    position: fixed;
+    display: none;
+    z-index: 99999999;
+    background-color: #ccc;
+    opacity: .4;
+}
