@@ -1,18 +1,18 @@
-jQuery(function($) {
-  
+jQuery(function ($) {
+
   //Watch all ajax activity
-  $(document).ajaxStop(function() {
-    
+  $(document).ajaxStop(function () {
+
     clearInterval(_lb.interval);
     $("#loading-bar")[_lb.direction]("101%");
 
     /**
      * Waits until css transition is finished and removes element from the DOM
      */
-    setTimeout( function() {
-      $("#loading-bar").fadeOut(300, function() {
+    setTimeout(function () {
+      $("#loading-bar").fadeOut(300, function () {
         $(this).remove();
-      $(".loadingOverlay").css("display", "none");
+        $(".loadingOverlay").css("display", "none");
       });
     }, 300);
 
@@ -26,79 +26,208 @@ jQuery(function($) {
 var _lb = {}
 
 //Default loading bar position
-_lb.position  = 'top';
+_lb.position = 'top';
 _lb.direction = 'width'
 
 /**
  * Ajax call
  * accepts callback( response )
  */
-_lb.get = function(url, callback) {
+_lb.get = function (url, callback) {
 
   _lb.loading = true;
 
   jQuery.ajax({
     url: url, // Replace with the actual URL you want to load
-    success: function(response) {
+    success: function (response) {
       _lb.loading = false;
-      if (typeof(callback) === 'function') {
+      if (typeof (callback) === 'function') {
         callback(response);
       }
     }
   });
 }
 
-jQuery(function($) {
+jQuery(function ($) {
 
-  $(document).on('click', 'a', function(event) {
+  $(document).on('click', 'a', function (event) {
     event.preventDefault();
-    
+
     var clickedAnchor = $(this); // Store the value of $(this)
 
     if ($(this).data('action') === 'load') {
 
+      if ($(this).attr("href").includes("account") || $(this).attr("href").includes("dashboard")) {
+        // Get login status:
+        fetch('./apis/Accounts/authentication')
+          .then(response => response.json())
+          .then(data => {
+            if (data.trang_thai === "failed") {
+              // Người dùng chưa đăng nhập :v
+              if ($('#loading-bar').length === 0) {
 
-      if ($('#loading-bar').length === 0) {
+                $('body').append($('<div/>').attr('id', 'loading-bar').addClass(_lb.position));
+                $(".loadingOverlay").css("display", "block");
 
-      $('body').append( $('<div/>').attr('id', 'loading-bar').addClass(_lb.position) );
-      $(".loadingOverlay").css("display", "block");
+                /**
+                 * Random loading bar initial percentage
+                 */
+                _lb.percentage = Math.random() * 30 + 30;
+                $("#loading-bar")[_lb.direction](_lb.percentage + "%");
 
-      /**
-       * Random loading bar initial percentage
-       */
-      _lb.percentage = Math.random() * 30 + 30;
-      $("#loading-bar")[_lb.direction](_lb.percentage + "%");
+                /**
+                 * Bump loading percentage between current and 99%
+                 */
+                _lb.interval = setInterval(function () {
 
-      /**
-       * Bump loading percentage between current and 99%
-       */
-      _lb.interval = setInterval(function() {
-        
-        _lb.percentage = Math.random() * ( (100-_lb.percentage) / 2 ) + _lb.percentage;
-        
-        $("#loading-bar")[_lb.direction](_lb.percentage + "%");
-        
-      }, 500);
+                  _lb.percentage = Math.random() * ((100 - _lb.percentage) / 2) + _lb.percentage;
 
-    }
+                  $("#loading-bar")[_lb.direction](_lb.percentage + "%");
 
-    setTimeout(function() {
-  _lb.get(clickedAnchor.attr('href'), function(response) {
-    document.write(response);
-    document.close();
-    window.history.pushState(
-      { additionalInformation: 'Updated the URL with JS' },
-      "",
-      clickedAnchor.attr('href') // Use the stored value
-    );
-  });
-}, 1000);
+                }, 500);
 
+              }
+
+              setTimeout(function () {
+                _lb.get('./login', function (response) {
+                  document.write(response);
+                  document.close();
+                  window.history.pushState({ additionalInformation: 'Updated the URL with JS' }, "", './login');
+                });
+              }, 1000);
+            } else {
+
+            }
+          })
+          .catch(error => {
+            console.log('Error:', error);
+          });
+      } else {
+        if ($('#loading-bar').length === 0) {
+
+          $('body').append($('<div/>').attr('id', 'loading-bar').addClass(_lb.position));
+          $(".loadingOverlay").css("display", "block");
+
+          /**
+           * Random loading bar initial percentage
+           */
+          _lb.percentage = Math.random() * 30 + 30;
+          $("#loading-bar")[_lb.direction](_lb.percentage + "%");
+
+          /**
+           * Bump loading percentage between current and 99%
+           */
+          _lb.interval = setInterval(function () {
+
+            _lb.percentage = Math.random() * ((100 - _lb.percentage) / 2) + _lb.percentage;
+
+            $("#loading-bar")[_lb.direction](_lb.percentage + "%");
+
+          }, 500);
+
+        }
+
+        setTimeout(function () {
+          _lb.get(clickedAnchor.attr('href'), function (response) {
+            document.write(response);
+            document.close();
+            window.history.pushState(
+              { additionalInformation: 'Updated the URL with JS' },
+              "",
+              clickedAnchor.attr('href') // Use the stored value
+            );
+          });
+        }, 1000);
+      }
 
     } else {
 
-      return;
-      
+      if ($(this).attr("href").includes("#")) {
+        // Per link (do not load):
+        return;
+      } else {
+        if ($(this).attr("href").includes("account") || $(this).attr("href").includes("dashboard")) {
+          // Get login status:
+          fetch('./apis/Accounts/authentication')
+            .then(response => response.json())
+            .then(data => {
+              if (data.trang_thai === "failed") {
+                // Người dùng chưa đăng nhập :v
+                if ($('#loading-bar').length === 0) {
+
+                  $('body').append($('<div/>').attr('id', 'loading-bar').addClass(_lb.position));
+                  $(".loadingOverlay").css("display", "block");
+
+                  /**
+                   * Random loading bar initial percentage
+                   */
+                  _lb.percentage = Math.random() * 30 + 30;
+                  $("#loading-bar")[_lb.direction](_lb.percentage + "%");
+
+                  /**
+                   * Bump loading percentage between current and 99%
+                   */
+                  _lb.interval = setInterval(function () {
+
+                    _lb.percentage = Math.random() * ((100 - _lb.percentage) / 2) + _lb.percentage;
+
+                    $("#loading-bar")[_lb.direction](_lb.percentage + "%");
+
+                  }, 500);
+
+                }
+
+                setTimeout(function () {
+                  _lb.get('./login', function (response) {
+                    document.write(response);
+                    document.close();
+                    window.history.pushState({ additionalInformation: 'Updated the URL with JS' }, "", './login');
+                  });
+                }, 1000);
+              } else {
+
+              }
+            })
+            .catch(error => {
+              console.log('Error:', error);
+            });
+        } else {
+          if ($('#loading-bar').length === 0) {
+
+            $('body').append($('<div/>').attr('id', 'loading-bar').addClass(_lb.position));
+            $(".loadingOverlay").css("display", "block");
+
+            /**
+             * Random loading bar initial percentage
+             */
+            _lb.percentage = Math.random() * 30 + 30;
+            $("#loading-bar")[_lb.direction](_lb.percentage + "%");
+
+            /**
+             * Bump loading percentage between current and 99%
+             */
+            _lb.interval = setInterval(function () {
+
+              _lb.percentage = Math.random() * ((100 - _lb.percentage) / 2) + _lb.percentage;
+
+              $("#loading-bar")[_lb.direction](_lb.percentage + "%");
+
+            }, 500);
+
+          }
+
+          setTimeout(function () {
+            _lb.get(clickedAnchor.attr("href"), function (response) {
+              document.write(response);
+              document.close();
+              window.history.pushState({ additionalInformation: 'Updated the URL with JS' }, "", clickedAnchor.attr("href"));
+            });
+          }, 1000);
+        }
+      }
+
+      // window.location.href = $(this).attr("href");
+
     }
   });
 
